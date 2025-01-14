@@ -1,0 +1,192 @@
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <title>{{title}}</title>
+  <link rel='stylesheet' href='/styles/output.css' />
+</head>
+<header class='bg-blue-700 text-white py-4 shadow-lg'>
+  <div class='container mx-auto flex justify-between items-center px-6'>
+    <a href='/'><h1 class='text-2xl font-bold tracking-wide'>Trip Planner</h1></a>
+    {{#if user}}
+      <div class='flex items-center space-x-4'>
+        <span class='text-sm'>Welcome,
+          <span class='font-semibold'>{{user.login}}</span>!</span>
+        <form method='POST' action='/users/logout' class='inline'>
+          <button
+            type='submit'
+            class='bg-red-500 px-4 py-2 rounded-lg shadow hover:bg-red-600 transition text-sm'
+          >
+            Logout
+          </button>
+        </form>
+      </div>
+    {{else}}
+      <div class='space-x-4'>
+        <form method='GET' action='/users/login' class='inline'>
+          <button
+            type='submit'
+            class='bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition text-sm'
+          >
+            Login
+          </button>
+        </form>
+        <form method='GET' action='/users/register' class='inline'>
+          <button
+            type='submit'
+            class='bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition text-sm'
+          >
+            Register
+          </button>
+        </form>
+      </div>
+    {{/if}}
+  </div>
+</header>
+<main class='container mx-auto px-6 py-8'>
+  <div class='bg-white p-6 rounded-lg shadow-lg'>
+    <div id='view-mode'>
+      <h1 class='text-2xl font-bold text-gray-700 mb-4'>{{trip.name}}</h1>
+      <p class='text-gray-600 mb-2'>{{trip.description}}</p>
+      <p class='text-sm text-gray-500 mb-4'>Country:
+        <span class='font-medium'>{{trip.country}}</span></p>
+      <p class='text-sm text-gray-500 mb-4'>Last Updated:
+        <span class='font-medium'>{{trip.last_open_time}}</span>
+      </p>
+      <button
+        id='edit-btn'
+        class='bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition'
+        onclick='toggleEditMode(true)'
+      >
+        Edit Trip
+      </button>
+    </div>
+    <section class='mt-8'>
+      <h2 class='text-xl font-bold text-gray-700 mb-4'>Locations</h2>
+      {{#if locations.length}}
+        <ul>
+          {{#each locations}}
+            <li class='bg-gray-100 p-4 rounded-lg mb-2 shadow-md'>
+              <h4 class='font-bold'>{{this.location_name}}</h4>
+              <p class='text-sm'>{{this.description}}</p>
+              <p class='text-sm'>Visit Start:
+                <span class='font-medium'>{{this.visit_start}}</span></p>
+              <p class='text-sm'>Visit End:
+                <span class='font-medium'>{{this.visit_end}}</span></p>
+              <p class='text-sm'>Priority:
+                <span class='font-medium'>{{this.priority}}</span></p>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p class='text-gray-600'>No locations added for this trip yet.</p>
+      {{/if}}
+    </section>
+    <form
+      id='edit-mode'
+      class='hidden'
+      method='POST'
+      action='/trips/trip/{{trip.id}}/edit'
+    >
+      <div class='mb-4'>
+        <label class='block text-sm font-medium text-gray-700'>Name</label>
+        <input
+          type='text'
+          name='name'
+          value='{{trip.name}}'
+          class='p-2 border border-gray-300 rounded w-full'
+        />
+      </div>
+      <div class='mb-4'>
+        <label
+          class='block text-sm font-medium text-gray-700'
+        >Description</label>
+        <textarea
+          name='description'
+          class='p-2 border border-gray-300 rounded w-full'
+        >{{trip.description}}</textarea>
+      </div>
+      <div class='mb-4'>
+        <label class='block text-sm font-medium text-gray-700'>Country</label>
+        <input
+          type='text'
+          name='country'
+          value='{{trip.country}}'
+          class='p-2 border border-gray-300 rounded w-full'
+        />
+      </div>
+      <section class='mt-8'>
+        <h2 class='text-xl font-bold text-gray-700 mb-4'>Locations</h2>
+        <div id='locations'>
+          {{#each locations}}
+            <div class='mb-4'>
+              <input
+                type='hidden'
+                name='locations[{{@index}}][id]'
+                value='{{this.id}}'
+              />
+              <label class='block text-sm font-medium text-gray-700'>Location
+                Name</label>
+              <input
+                type='text'
+                name='locations[{{@index}}][name]'
+                value='{{this.location_name}}'
+                class='p-2 border border-gray-300 rounded w-full'
+              />
+              <label
+                class='block text-sm font-medium text-gray-700'
+              >Description</label>
+              <textarea
+                name='locations[{{@index}}][description]'
+                class='p-2 border border-gray-300 rounded w-full'
+              >{{this.description}}</textarea>
+              <label class='block text-sm font-medium text-gray-700'>Visit Start</label>
+              <input
+                type='date'
+                name='locations[{{@index}}][visitStart]'
+                value='{{this.visit_start}}'
+                class='p-2 border border-gray-300 rounded w-full'
+              />
+              <label class='block text-sm font-medium text-gray-700'>Visit End</label>
+              <input
+                type='date'
+                name='locations[{{@index}}][visitEnd]'
+                value='{{this.visit_end}}'
+                class='p-2 border border-gray-300 rounded w-full'
+              />
+              <label
+                class='block text-sm font-medium text-gray-700'
+              >Priority</label>
+              <input
+                type='number'
+                name='locations[{{@index}}][priority]'
+                value='{{this.priority}}'
+                class='p-2 border border-gray-300 rounded w-full'
+              />
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <div class='flex gap-4'>
+        <button
+          type='submit'
+          class='bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition'
+        >
+          Save Changes
+        </button>
+        <button
+          type='button'
+          class='bg-gray-500 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-600 transition'
+          onclick='toggleEditMode(false)'
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+<script>
+  function toggleEditMode(isEdit) {
+  document.getElementById("view-mode").classList.toggle("hidden", isEdit);
+  document.getElementById("edit-mode").classList.toggle("hidden", !isEdit); }
+</script>

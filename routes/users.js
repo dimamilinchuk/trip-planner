@@ -46,7 +46,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { login, password } = req.body;
-
+  console.log(req.body)
   try {
     db.get(
       'SELECT * FROM users WHERE login = ?',
